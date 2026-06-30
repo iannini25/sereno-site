@@ -1,0 +1,7 @@
+Esta pasta recebe o AVANCO da camera (frames-1): os frames do video parte1.mp4
+(a camera anda pra frente, da sala ate perto da maca).
+
+Gerada por:  bash scripts/extract_frames.sh   (precisa de ffmpeg)
+Preenche 0001.jpg, 0002.jpg ... e atualiza assets/frames.json (clip1).
+
+(Mantenha este arquivo para a pasta existir mesmo vazia.)

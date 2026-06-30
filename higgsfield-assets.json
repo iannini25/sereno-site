@@ -1,0 +1,44 @@
+{
+  "_comment": "Assets gerados no Higgsfield (conta do usuario) para este projeto. As URLs do CloudFront podem expirar; se algum link cair, regenere pelo MCP do Higgsfield usando os parametros em CLAUDE_CODE_PROMPT.md. O agente que rodou na nuvem NAO conseguiu baixar esses arquivos (rede restrita); o download e a extracao de frames sao feitos por scripts/extract_frames.sh na maquina do usuario.",
+
+  "model_image": "nano_banana_2",
+  "model_video": "kling3_0",
+
+  "images": {
+    "A_sala_inicio": {
+      "job_id": "4ff0c4f6-78cf-4cac-89fb-1a80254f2ef6",
+      "papel": "Primeiro frame do video 1 (imagem original enviada pelo usuario).",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_33pl57DG2GtVM1nUAyRIfm7ZZME/hf_20260626_035453_4ff0c4f6-78cf-4cac-89fb-1a80254f2ef6.png",
+      "arquivo_local": "assets/img/room.jpg (ja incluso no zip, recorte 16:9)"
+    },
+    "B_sala_profunda": {
+      "job_id": "ca0a83d7-c5b9-4f4e-aa5c-12d2a034ae3b",
+      "papel": "Ultimo frame do video 1 e primeiro do video 2 (a EMENDA). Garante corte invisivel entre os clipes.",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_33pl57DG2GtVM1nUAyRIfm7ZZME/hf_20260628_035024_ca0a83d7-c5b9-4f4e-aa5c-12d2a034ae3b.png",
+      "arquivo_local": "assets/img/room-deep.jpg (baixado pelo script)"
+    },
+    "C_recepcao": {
+      "job_id": "c7f075b4-0693-49dc-95f5-33c44d10d66b",
+      "papel": "Ultimo frame do video 2: a recepcao, mesma paleta/arquitetura, vista de cima, com area limpa no alto da parede para o CTA.",
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_33pl57DG2GtVM1nUAyRIfm7ZZME/hf_20260628_035037_c7f075b4-0693-49dc-95f5-33c44d10d66b.png",
+      "arquivo_local": "assets/img/reception.jpg (baixado pelo script)"
+    }
+  },
+
+  "videos": {
+    "video1_avanco": {
+      "job_id": "f99dba76-d71b-43d6-8e06-dc66f06796a9",
+      "papel": "Camera flutua e avanca para dentro da sala (dolly-in estabilizado). A -> B.",
+      "params": { "model": "kling3_0", "mode": "pro", "duration": 5, "sound": false, "aspect_ratio": "16:9", "start_image": "job A", "end_image": "job B" },
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_33pl57DG2GtVM1nUAyRIfm7ZZME/hf_20260628_035520_f99dba76-d71b-43d6-8e06-dc66f06796a9.mp4",
+      "arquivo_local": "assets/video/clip1.mp4 (baixado pelo script)"
+    },
+    "video2_queda": {
+      "job_id": "9d354fa1-7cd2-4d05-827c-deadab500a7b",
+      "papel": "Camera tomba e desce ate pousar na recepcao (crane-down). B -> C.",
+      "params": { "model": "kling3_0", "mode": "pro", "duration": 5, "sound": false, "aspect_ratio": "16:9", "start_image": "job B", "end_image": "job C" },
+      "url": "https://d8j0ntlcm91z4.cloudfront.net/user_33pl57DG2GtVM1nUAyRIfm7ZZME/hf_20260628_035528_9d354fa1-7cd2-4d05-827c-deadab500a7b.mp4",
+      "arquivo_local": "assets/video/clip2.mp4 (baixado pelo script)"
+    }
+  }
+}

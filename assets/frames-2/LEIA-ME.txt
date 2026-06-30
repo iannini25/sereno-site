@@ -1,0 +1,8 @@
+Esta pasta recebe a DESCIDA (frames-2): os frames do video parte2.mp4
+(a camera desce pelo piso e chega na recepcao).
+
+Gerada por:  bash scripts/extract_frames.sh   (precisa de ffmpeg)
+Preenche 0001.jpg, 0002.jpg ... e atualiza assets/frames.json (clip2).
+O 1o frame casa com o ultimo do avanco (parte1) -> emenda invisivel.
+
+(Mantenha este arquivo para a pasta existir mesmo vazia.)

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Sereno · Estúdio de Massagem & Repouso</title>
+  <meta name="description" content="Sereno — um santuário de massagem e relaxamento. Luz quente, toque preciso e o tempo, enfim, desacelera. Agende sua sessão." />
+  <meta name="theme-color" content="#f7efe8" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Sereno · Estúdio de Massagem & Repouso" />
+  <meta property="og:description" content="O mundo pode esperar. Um santuário de massagem onde o corpo, enfim, descansa." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/img/reception.jpg" />
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+
+  <!-- LCP: imagem de fundo do hero (baixa cedo, sem esperar o hero.js executar) -->
+  <link rel="preload" as="image" href="assets/img/room.jpg" />
+
+  <!-- Conexões antecipadas com os CDNs das libs (GSAP/Lenis) -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+
+  <!-- Fonts: Cormorant Garamond (display) + Jost (texto/UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#topo">Pular para o conteúdo</a>
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="nav" id="nav" data-nav>
+    <div class="nav__inner">
+      <a class="brand" href="#topo" aria-label="Sereno — início">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__word">Sereno</span>
+      </a>
+
+      <nav class="nav__links" aria-label="Navegação principal">
+        <a href="#casa">A&nbsp;Casa</a>
+        <a href="#rituais">Rituais</a>
+        <a href="#experiencia">Experiência</a>
+        <a href="#planos">Planos</a>
+        <a href="#vozes">Vozes</a>
+        <a href="#visite">Visite</a>
+      </nav>
+
+      <a href="#visite" class="btn btn--ghost nav__cta">Agendar</a>
+
+      <button class="nav__burger" id="burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="drawer">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Menu mobile -->
+  <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu de navegação" aria-hidden="true">
+    <nav class="drawer__links" aria-label="Menu">
+      <a href="#casa">A Casa</a>
+      <a href="#rituais">Rituais</a>
+      <a href="#experiencia">Experiência</a>
+      <a href="#planos">Planos</a>
+      <a href="#vozes">Vozes</a>
+      <a href="#visite">Visite</a>
+      <a href="#visite" class="btn btn--gold drawer__cta">Agendar uma sessão</a>
+    </nav>
+  </div>
+
+  <main id="topo" tabindex="-1">
+
+    <!-- ============ HERO — SCROLL-VÍDEO (2 clipes emendados) ============ -->
+    <section class="hero" id="hero" aria-label="Apresentação">
+      <div class="hero__sticky">
+        <canvas class="hero__canvas" id="film" aria-hidden="true"></canvas>
+        <div class="hero__scrim" aria-hidden="true"></div>
+
+        <!-- Camada 1: título no topo (zona limpa do teto/parede) -->
+        <div class="hero__layer hero__layer--top" data-layer="room">
+          <p class="eyebrow eyebrow--light">Estúdio de massagem &amp; repouso</p>
+          <h1 class="hero__title">O mundo<br />pode esperar.</h1>
+          <p class="hero__sub">Um santuário onde a luz é quente, o toque é preciso<br class="br-desk" /> e o tempo, enfim, desacelera.</p>
+          <div class="hero__cta">
+            <a href="#visite" class="btn btn--gold">Reservar um horário</a>
+            <a href="#rituais" class="link-quiet">ver os rituais →</a>
+          </div>
+        </div>
+
+        <!-- Camada 2: recepção (texto sobre a área limpa da imagem) -->
+        <div class="hero__layer hero__layer--reception" data-layer="reception" aria-hidden="true">
+          <p class="eyebrow eyebrow--light">Bem-vindo</p>
+          <h2 class="hero__title hero__title--sm">Você chegou.<br />Agora, é só respirar.</h2>
+          <p class="hero__sub">Deixe os sapatos, o relógio e a pressa na entrada.</p>
+          <div class="hero__cta">
+            <a href="#rituais" class="btn btn--gold">Conhecer os rituais</a>
+          </div>
+        </div>
+
+        <!-- dica de scroll -->
+        <div class="hero__hint" id="scrollHint" aria-hidden="true">
+          <span>role para entrar</span>
+          <span class="hero__hint-line"></span>
+        </div>
+
+        <!-- loader de pré-carregamento -->
+        <div class="loader" id="loader" aria-hidden="true">
+          <div class="loader__brand">Sereno</div>
+          <div class="loader__bar"><i id="loaderFill"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- fio dourado de assinatura que se desenha no scroll -->
+    <svg class="thread" id="thread" width="2" height="100%" viewBox="0 0 2 1000" preserveAspectRatio="none" aria-hidden="true">
+      <path id="threadPath" d="M1 0 L1 1000" vector-effect="non-scaling-stroke" />
+    </svg>
+
+    <!-- ============ A CASA ============ -->
+    <section class="section casa" id="casa">
+      <div class="wrap">
+        <p class="eyebrow reveal">A Casa</p>
+        <h2 class="display display--xl reveal">
+          Não vendemos massagem.<br />
+          <em>Devolvemos o seu corpo para você.</em>
+        </h2>
+        <p class="lede reveal">
+          O Sereno nasceu de uma ideia simples: criar um lugar onde o corpo possa, enfim, baixar a
+          guarda. Cada detalhe — a luz âmbar, o aroma discreto, a temperatura da sala, o tempo que
+          ninguém apressa — existe para conduzir você de volta ao descanso.
+        </p>
+
+        <div class="pillars">
+          <article class="pillar reveal">
+            <span class="pillar__idx">01</span>
+            <h3>Silêncio</h3>
+            <p>Salas tratadas acusticamente. O som, aqui, é só a sua respiração.</p>
+          </article>
+          <article class="pillar reveal">
+            <span class="pillar__idx">02</span>
+            <h3>Toque</h3>
+            <p>Terapeutas formados, mãos que leem o seu corpo e ajustam a cada sessão.</p>
+          </article>
+          <article class="pillar reveal">
+            <span class="pillar__idx">03</span>
+            <h3>Tempo</h3>
+            <p>Sessões sem relógio à vista. Você sai quando o corpo decide.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RITUAIS ============ -->
+    <section class="section rituais" id="rituais">
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow reveal">Rituais</p>
+            <h2 class="display display--lg reveal">Cada toque<br />tem um propósito.</h2>
+          </div>
+          <p class="section__intro reveal">
+            Escolha pelo que o seu corpo está pedindo hoje. Todos os rituais começam com um
+            escalda-pés e um chá — o resto é deixar acontecer.
+          </p>
+        </div>
+
+        <ul class="menu" role="list">
+          <li class="menu__item reveal">
+            <div class="menu__name"><h3>Sereno Clássico</h3><span class="tag">Relaxante</span></div>
+            <p class="menu__desc">Pressão suave e contínua para desacelerar o sistema nervoso.</p>
+            <div class="menu__meta"><span>60 · 90 min</span><span class="menu__price">R$ 240 / 320</span></div>
+          </li>
+          <li class="menu__item reveal">
+            <div class="menu__name"><h3>Toque Profundo</h3><span class="tag">Terapêutica</span></div>
+            <p class="menu__desc">Trabalho firme nos nós e nas tensões que a semana acumulou.</p>
+            <div class="menu__meta"><span>60 · 90 min</span><span class="menu__price">R$ 270 / 360</span></div>
+          </li>
+          <li class="menu__item reveal">
+            <div class="menu__name"><h3>Pedras Quentes</h3><span class="tag">Calor</span></div>
+            <p class="menu__desc">O calor solta a musculatura antes mesmo do primeiro toque.</p>
+            <div class="menu__meta"><span>80 min</span><span class="menu__price">R$ 340</span></div>
+          </li>
+          <li class="menu__item reveal">
+            <div class="menu__name"><h3>Drenagem Linfática</h3><span class="tag">Leveza</span></div>
+            <p class="menu__desc">Movimentos rítmicos que desincham, renovam e aliviam.</p>
+            <div class="menu__meta"><span>60 min</span><span class="menu__price">R$ 260</span></div>
+          </li>
+          <li class="menu__item reveal">
+            <div class="menu__name"><h3>Ritual a Dois</h3><span class="tag">Casal</span></div>
+            <p class="menu__desc">Duas macas, duas terapeutas, um só clima.</p>
+            <div class="menu__meta"><span>90 min</span><span class="menu__price">R$ 690</span></div>
+          </li>
+          <li class="menu__item menu__item--star reveal">
+            <div class="menu__name"><h3>Áureo</h3><span class="tag tag--gold">Assinatura</span></div>
+            <p class="menu__desc">Massagem, aromaterapia e escalda-pés em sequência. Nosso ápice.</p>
+            <div class="menu__meta"><span>120 min</span><span class="menu__price">R$ 480</span></div>
+          </li>
+        </ul>
+
+        <p class="note reveal">Valores ilustrativos. Pacotes e cortesias para a primeira visita no <a href="#visite">agendamento</a>.</p>
+      </div>
+    </section>
+
+    <!-- ============ A EXPERIÊNCIA (galeria horizontal com pin) ============ -->
+    <section class="experiencia" id="experiencia" aria-label="A experiência de uma visita">
+      <div class="exp__pin" id="expPin">
+        <div class="exp__intro">
+          <p class="eyebrow eyebrow--light">A Experiência</p>
+          <h2 class="display display--lg">Do portão<br />ao suspiro final.</h2>
+          <p class="exp__hint">role&nbsp;→</p>
+        </div>
+        <div class="exp__track" id="expTrack">
+          <article class="step">
+            <span class="step__idx">01</span>
+            <h3>Chegada</h3>
+            <p>Um chá morno, luz baixa e tempo para o corpo perceber que pode parar.</p>
+          </article>
+          <article class="step">
+            <span class="step__idx">02</span>
+            <h3>Aromas</h3>
+            <p>Você escolhe o óleo essencial que vai assinar a sua sessão.</p>
+          </article>
+          <article class="step">
+            <span class="step__idx">03</span>
+            <h3>O toque</h3>
+            <p>Mãos que ajustam pressão e ritmo ao que o seu corpo responde.</p>
+          </article>
+          <article class="step">
+            <span class="step__idx">04</span>
+            <h3>Repouso</h3>
+            <p>Alguns minutos só seus, em silêncio, antes de voltar ao mundo.</p>
+          </article>
+          <article class="step">
+            <span class="step__idx">05</span>
+            <h3>Despedida</h3>
+            <p>Água, um doce e nenhuma pressa para ir embora.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PLANOS ============ -->
+    <section class="section planos" id="planos">
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow reveal">Planos</p>
+            <h2 class="display display--lg reveal">Descansar<br />pode ser hábito.</h2>
+          </div>
+          <p class="section__intro reveal">
+            Quem cuida do corpo com constância dorme melhor, trabalha melhor e adoece menos.
+            Escolha o ritmo que cabe na sua vida.
+          </p>
+        </div>
+
+        <div class="plans">
+          <article class="plan reveal">
+            <h3 class="plan__name">Avulso</h3>
+            <p class="plan__tag">para conhecer</p>
+            <p class="plan__price">a partir de <strong>R$ 240</strong></p>
+            <ul role="list">
+              <li>Qualquer ritual, sem compromisso</li>
+              <li>Agendamento flexível</li>
+              <li>Sem fidelidade</li>
+            </ul>
+            <a href="#visite" class="btn btn--ghost plan__btn">Agendar</a>
+          </article>
+
+          <article class="plan plan--star reveal">
+            <span class="plan__ribbon">o favorito</span>
+            <h3 class="plan__name">Sereno Mensal</h3>
+            <p class="plan__tag">para manter o hábito</p>
+            <p class="plan__price"><strong>R$ 760</strong><span>/mês</span></p>
+            <ul role="list">
+              <li>4 sessões por mês</li>
+              <li>Horários prioritários</li>
+              <li>10% de desconto nos extras</li>
+              <li>Reposição de sessões</li>
+            </ul>
+            <a href="#visite" class="btn btn--gold plan__btn">Quero esse</a>
+          </article>
+
+          <article class="plan reveal">
+            <h3 class="plan__name">Áureo Anual</h3>
+            <p class="plan__tag">cuidado como ritual</p>
+            <p class="plan__price"><strong>sob consulta</strong></p>
+            <ul role="list">
+              <li>1 sessão por semana</li>
+              <li>Convidado a cada trimestre</li>
+              <li>Brindes e edições da casa</li>
+              <li>Terapeuta dedicado</li>
+            </ul>
+            <a href="#visite" class="btn btn--ghost plan__btn">Falar com a casa</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VOZES ============ -->
+    <section class="section vozes" id="vozes">
+      <div class="wrap">
+        <p class="eyebrow reveal">Vozes</p>
+        <h2 class="display display--lg reveal">Quem desacelera, volta.</h2>
+
+        <div class="quotes">
+          <figure class="quote reveal">
+            <blockquote>“Saí de lá sem saber em que dia eu estava. No melhor sentido possível.”</blockquote>
+            <figcaption>Marina A.</figcaption>
+          </figure>
+          <figure class="quote reveal">
+            <blockquote>“A primeira vez em meses que a minha cabeça ficou em silêncio.”</blockquote>
+            <figcaption>Rafael T.</figcaption>
+          </figure>
+          <figure class="quote reveal">
+            <blockquote>“Marquei para experimentar. Virei assinante na mesma semana.”</blockquote>
+            <figcaption>Júlia M.</figcaption>
+          </figure>
+        </div>
+
+        <p class="stat reveal"><strong>4,9&nbsp;★</strong> de média · <strong>+1.200</strong> sessões realizadas</p>
+      </div>
+    </section>
+
+    <!-- ============ VISITE / AGENDAR ============ -->
+    <section class="section visite" id="visite">
+      <div class="wrap visite__grid">
+        <div class="visite__copy">
+          <p class="eyebrow reveal">Visite</p>
+          <h2 class="display display--lg reveal">Seu corpo<br />já sabe o caminho.</h2>
+          <p class="lede reveal">
+            Conte o que você procura e a melhor data. A gente confirma pelo WhatsApp em minutos —
+            sem formulário interminável.
+          </p>
+
+          <!-- ⚠️ PLACEHOLDERS ilustrativos (peça de portfólio). Antes de publicar, troque por
+               dados reais: horário · endereço · Instagram · WhatsApp. O número usado pelo
+               formulário fica em js/app.js (const PHONE). Mantenha o texto exibido em sincronia. -->
+          <dl class="info reveal">
+            <div><dt>Horário</dt><dd>Terça a domingo · 9h às 21h</dd></div>
+            <div><dt>Endereço</dt><dd>Rua das Acácias, 128 · Savassi, Belo Horizonte</dd></div>
+            <div><dt>WhatsApp</dt><dd>(31) 9&nbsp;9999&#8209;9999</dd></div>
+            <div><dt>Instagram</dt><dd>@sereno.repouso</dd></div>
+          </dl>
+        </div>
+
+        <form class="booking reveal" id="booking" novalidate>
+          <h3 class="booking__title">Agendar pelo WhatsApp</h3>
+
+          <label class="field">
+            <span>Seu nome</span>
+            <input type="text" name="nome" id="f-nome" autocomplete="name" placeholder="Como podemos te chamar?" required />
+          </label>
+
+          <label class="field">
+            <span>WhatsApp</span>
+            <input type="tel" name="fone" id="f-fone" autocomplete="tel" inputmode="tel" placeholder="(31) 9 0000-0000" required />
+          </label>
+
+          <label class="field">
+            <span>Ritual desejado</span>
+            <select name="ritual" id="f-ritual">
+              <option>Sereno Clássico (relaxante)</option>
+              <option>Toque Profundo (terapêutica)</option>
+              <option>Pedras Quentes</option>
+              <option>Drenagem Linfática</option>
+              <option>Ritual a Dois (casal)</option>
+              <option>Áureo (assinatura)</option>
+              <option>Ainda não sei — me ajudem a escolher</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Dia de preferência</span>
+            <input type="text" name="dia" id="f-dia" placeholder="Ex.: sábado de manhã" />
+          </label>
+
+          <button type="submit" class="btn btn--gold booking__send">Enviar pelo WhatsApp</button>
+          <p class="booking__status" id="booking-status" role="status" aria-live="polite"></p>
+          <p class="booking__fine">Resposta rápida, sem robôs. Seus dados ficam só com a gente.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ RODAPÉ ============ -->
+  <footer class="foot">
+    <div class="wrap foot__grid">
+      <div class="foot__brand">
+        <span class="brand__word">Sereno</span>
+        <p>Feito para desacelerar.</p>
+      </div>
+      <nav class="foot__nav" aria-label="Rodapé">
+        <a href="#casa">A Casa</a>
+        <a href="#rituais">Rituais</a>
+        <a href="#experiencia">Experiência</a>
+        <a href="#planos">Planos</a>
+        <a href="#visite">Agendar</a>
+      </nav>
+      <p class="foot__legal">© 2026 Sereno Estúdio de Massagem · Savassi, Belo Horizonte</p>
+    </div>
+  </footer>
+
+  <!-- ============ Bibliotecas (CDN) ============ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+
+  <script src="js/hero.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
