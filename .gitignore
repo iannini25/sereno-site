@@ -1,14 +1,42 @@
-# OS
+# ── SO / editor ──
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# Editor
 .vscode/
 .idea/
 *.swp
 *~
 
-# Logs / temp
+# ── Logs / temp ──
 *.log
 .cache/
+.env
+
+# ── Fontes do vídeo do herói ──
+# 16MB de MP4; o site usa os frames já versionados em assets/frames-1/2.
+# Para regerar os frames a partir dos vídeos: scripts/extract_frames.sh
+parte1.mp4
+parte2.mp4
+higgsfield-assets.json
+
+# ── Fotos-fonte ──
+# Originais em alta (algumas são previews de banco de imagem, sem licença).
+# Só as versões otimizadas em assets/img/ são publicadas.
+assets/originais/
+
+# ── Kit de desenvolvimento (repo iannini-Frontend-Studio, não faz parte do site) ──
+.claude/
+_ref/
+vendor/
+prompts/
+showcase/
+CLAUDE.md
+CATALOGO.md
+SISTEMA.md
+FONTES.md
+components-catalog.md
+skills-lock.json
+requirements.txt
+fonts-manifest.json
+fonts-woff2/
+specimen*.html

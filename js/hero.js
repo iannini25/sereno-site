@@ -216,7 +216,20 @@
     document.documentElement.dataset.heroMode = mode; // 'frames' | 'image2' | 'image1'
     resize();
     bindScroll();
+    cullWhenCovered();
     if (loaderEl) loaderEl.classList.add('is-done');
+  }
+
+  // O fundo do herói é fixed: quando a seção sai da tela (as seções seguintes
+  // já cobrem tudo), esconde a camada para o navegador não compositar canvas
+  // e animações atrás do conteúdo. O rootMargin reexibe um pouco antes de o
+  // topo do herói voltar, para nenhum quadro aparecer "em branco".
+  function cullWhenCovered() {
+    const stickyEl = document.querySelector('.hero__sticky');
+    if (!stickyEl || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver(([e]) => {
+      stickyEl.style.visibility = e.isIntersecting ? 'visible' : 'hidden';
+    }, { rootMargin: '12% 0px 12% 0px' }).observe(heroEl);
   }
 
   // ---------- carregamento ----------

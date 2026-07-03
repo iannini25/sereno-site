@@ -15,20 +15,24 @@
   --blush-2:    #e3b8b0;
   --rose:       #cf988f;
   --rose-deep:  #b87a70;
+  --rose-text:  #a3564a;   /* rosé escuro p/ TEXTO pequeno (AA ≥4.5:1) */
 
   /* tinta (texto) — marrom-rosé quente, nunca preto puro */
   --ink:        #4a3a36;
   --ink-soft:   #6d5751;
-  --ink-faint:  #9a847e;
+  --ink-faint:  #786259;   /* escurecido p/ passar AA em rótulos/notas (era #9a847e) */
 
   /* dourado */
   --gold:       #b8924a;
   --gold-2:     #c8a763;
   --gold-soft:  #e0c896;
+  /* dourado profundo p/ TEXTO pequeno sobre creme (WCAG AA ≥4.5:1) */
+  --gold-deep:  #856327;
 
   /* linhas / véus */
   --line:       rgba(74, 58, 54, .14);
   --line-soft:  rgba(74, 58, 54, .08);
+  --line-light: rgba(253, 245, 239, .12);  /* hairline sobre faixas escuras */
 
   /* texto sobre o vídeo */
   --on-film:    #fdf5ef;
@@ -84,7 +88,7 @@ main { position: relative; } /* contexto p/ o fio dourado (.thread) medir altura
 
 /* ---------- foco visível por teclado (WCAG 2.4.7 / 2.4.11) ---------- */
 :where(a, .btn, button, summary):focus-visible {
-  outline: 2px solid var(--gold); outline-offset: 3px;
+  outline: 2px solid var(--gold-deep); outline-offset: 3px;
 }
 /* variante clara sobre o hero/rodapé escuros e a navbar transparente */
 .nav__links a:focus-visible, .nav__cta:focus-visible, .brand:focus-visible,
@@ -137,7 +141,7 @@ main { position: relative; } /* contexto p/ o fio dourado (.thread) medir altura
 .note {
   margin-top: 2.6rem; font-size: .9rem; color: var(--ink-faint); letter-spacing: .01em;
 }
-.note a { color: var(--gold); border-bottom: 1px solid var(--line); }
+.note a { color: var(--gold-deep); border-bottom: 1px solid var(--line); }
 
 /* ---------- botões ---------- */
 .btn {
@@ -180,10 +184,9 @@ main { position: relative; } /* contexto p/ o fio dourado (.thread) medir altura
   display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
 }
 .brand { display: inline-flex; align-items: center; gap: .6rem; color: var(--on-film); }
-.brand__mark {
-  width: 9px; height: 9px; border-radius: 50%;
-  background: var(--gold-2); box-shadow: 0 0 0 4px rgba(224,200,150,.25);
-}
+/* a gota da marca (mesma do favicon) — padroniza o símbolo em nav/loader/rodapé */
+.brand__mark { display: inline-flex; width: 15px; height: 21px; }
+.brand__mark svg { width: 100%; height: 100%; }
 .brand__word {
   font-family: var(--display); font-size: 1.55rem; font-weight: 400;
   letter-spacing: .14em; line-height: 1;
@@ -216,7 +219,7 @@ main { position: relative; } /* contexto p/ o fio dourado (.thread) medir altura
 .nav--solid .brand,
 .nav--solid .nav__links a { color: var(--ink); }
 .nav--solid .nav__cta { color: var(--ink); border-color: var(--line); }
-.nav--solid .nav__cta:hover { background: var(--gold); color: var(--paper); }
+.nav--solid .nav__cta:hover { background: var(--gold-deep); color: var(--paper); }
 .nav--solid .nav__burger span { background: var(--ink); }
 
 .nav__burger {
@@ -259,9 +262,13 @@ body.menu-open .drawer {
    HERO — scroll-vídeo
    ================================================================= */
 .hero { position: relative; height: var(--hero-h); background: var(--ink); }
+/* fixo (não sticky): durante o scrub rende idêntico, mas no fim o último frame
+   permanece parado como fundo e as seções deslizam por cima, sem salto.
+   As seções pós-herói sobem de camada logo abaixo (z-index: 1). */
 .hero__sticky {
-  position: sticky; top: 0; height: 100svh; height: 100dvh;
-  overflow: hidden; background: #2a1f1c;
+  position: fixed; top: 0; left: 0; width: 100%;
+  height: 100svh; height: 100dvh;
+  overflow: hidden; background: #2a1f1c; z-index: 0;
 }
 .hero__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
@@ -318,6 +325,7 @@ body.menu-open .drawer {
   transition: opacity .8s var(--ease), visibility .8s;
 }
 .loader.is-done { opacity: 0; visibility: hidden; }
+.loader__mark { height: 38px; width: auto; }
 .loader__brand {
   font-family: var(--display); font-size: 2rem; color: var(--on-film);
   letter-spacing: .3em; opacity: .9;
@@ -325,10 +333,13 @@ body.menu-open .drawer {
 .loader__bar { width: min(56vw, 240px); height: 1px; background: rgba(253,245,239,.2); overflow: hidden; }
 .loader__bar i { display: block; height: 100%; width: 0; background: var(--gold-2); transition: width .25s linear; }
 
-/* fio dourado de assinatura */
+/* conteúdo pós-herói acima do fundo fixo do hero */
+main > section:not(.hero), .foot { position: relative; z-index: 1; }
+
+/* fio dourado de assinatura (acima das seções, como antes do fundo fixo) */
 .thread {
   position: absolute; top: var(--hero-h); left: clamp(14px, 4vw, 60px);
-  height: calc(100% - var(--hero-h)); z-index: 1; pointer-events: none; overflow: visible;
+  height: calc(100% - var(--hero-h)); z-index: 2; pointer-events: none; overflow: visible;
 }
 .thread path { fill: none; stroke: var(--gold); stroke-width: 1.6; opacity: .85; }
 
@@ -338,6 +349,36 @@ body.menu-open .drawer {
 .casa { background: var(--cream); }
 .casa .display { max-width: 16ch; }
 .casa .lede { margin-top: 2rem; }
+
+/* texto à esquerda, foto à direita; pilares atravessam embaixo */
+.casa .wrap { display: grid; grid-template-columns: 7fr 5fr; column-gap: clamp(2rem, 6vw, 5rem); }
+.casa .eyebrow, .casa .display, .casa .lede { grid-column: 1; }
+.casa .pillars { grid-column: 1 / -1; }
+
+/* foto da pausa — forma orgânica de seixo (nada de retângulo/círculo),
+   com véu blush atrás e um eco de contorno dourado deslocado */
+.casa__figure {
+  grid-column: 2; grid-row: 1 / span 3; align-self: center; justify-self: center;
+  position: relative; margin: 0; width: min(100%, 400px);
+}
+.casa__figure::before {
+  content: ""; position: absolute; inset: -14% -18%; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(58% 52% at 70% 26%, rgba(236,204,198,.55), transparent 72%),
+    radial-gradient(52% 48% at 26% 76%, rgba(200,167,99,.30), transparent 74%);
+}
+.casa__figure::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  border: 1px solid rgba(184,146,74,.45);
+  border-radius: 62% 38% 46% 54% / 55% 42% 61% 45%;
+  transform: rotate(-5deg) translate(-12px, 10px);
+}
+.casa__figure img {
+  position: relative; z-index: 1; width: 100%; height: auto;
+  aspect-ratio: 3 / 4; object-fit: cover;
+  border-radius: 62% 38% 46% 54% / 55% 42% 61% 45%;
+  filter: sepia(.1) saturate(.95);
+}
 
 .pillars {
   margin-top: clamp(3.5rem, 7vw, 6rem);
@@ -373,7 +414,6 @@ body.menu-open .drawer {
   border-bottom: 1px solid var(--line);
   transition: background .4s var(--ease);
 }
-.menu__item:hover { background: rgba(236,204,198,.12); box-shadow: inset 3px 0 0 var(--gold); }
 .menu__name { display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap; }
 .menu__name h3 { font-family: var(--display); font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight: 400; }
 .menu__desc { color: var(--ink-soft); font-size: .96rem; }
@@ -384,10 +424,10 @@ body.menu-open .drawer {
 
 .tag {
   font-size: .64rem; letter-spacing: .18em; text-transform: uppercase;
-  color: var(--rose-deep); border: 1px solid var(--line); border-radius: 999px;
+  color: var(--rose-text); border: 1px solid var(--line); border-radius: 999px;
   padding: .3em .8em; line-height: 1;
 }
-.tag--gold { color: var(--gold); border-color: rgba(184,146,74,.4); }
+.tag--gold { color: var(--gold-deep); border-color: rgba(184,146,74,.4); }
 
 /* =================================================================
    A EXPERIÊNCIA — galeria horizontal com pin
@@ -440,7 +480,7 @@ body.menu-open .drawer {
 .plan__price strong { font-size: 2.1rem; color: var(--ink); font-weight: 500; }
 .plan__price span { font-size: 1rem; color: var(--ink-faint); }
 .plan ul { display: flex; flex-direction: column; gap: .8rem; margin-bottom: 2rem; }
-.plan li { font-size: .96rem; color: var(--ink-soft); padding-left: 1.4rem; position: relative; }
+.plan li { list-style: none; font-size: .96rem; color: var(--ink-soft); padding-left: 1.4rem; position: relative; }
 .plan li::before {
   content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 8px;
   border-bottom: 1.5px solid var(--gold); border-left: 1.5px solid var(--gold);
@@ -453,13 +493,13 @@ body.menu-open .drawer {
    ================================================================= */
 .vozes { background: var(--cream-2); text-align: center; }
 .vozes .display { margin-bottom: clamp(3rem, 6vw, 4.5rem); }
-.quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 4vw, 3.5rem); }
+.quotes { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(1.5rem, 4vw, 3.5rem); }
 .quote { margin: 0; }
 .quote blockquote {
   font-family: var(--display); font-size: clamp(1.3rem, 2vw, 1.6rem);
   font-style: italic; line-height: 1.4; color: var(--ink); margin: 0 0 1.2rem;
 }
-.quote figcaption { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); }
+.quote figcaption { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-deep); }
 .stat { margin-top: clamp(3rem, 6vw, 4.5rem); color: var(--ink-soft); font-size: 1.05rem; }
 .stat strong { font-family: var(--display); color: var(--ink); font-size: 1.3rem; }
 
@@ -471,7 +511,7 @@ body.menu-open .drawer {
 .visite__copy .lede { margin: 2rem 0; }
 .info { display: grid; gap: 1.4rem; margin: 0; }
 .info div { border-top: 1px solid var(--line); padding-top: .9rem; }
-.info dt { font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: .3rem; }
+.info dt { font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: .3rem; }
 .info dd { margin: 0; color: var(--ink); font-size: 1.02rem; }
 
 .booking {
@@ -494,7 +534,7 @@ body.menu-open .drawer {
 }
 .booking__send { width: 100%; margin-top: .4rem; }
 .booking__fine { margin: 1rem 0 0; font-size: .8rem; color: var(--ink-faint); text-align: center; }
-.booking__status { margin: 1rem 0 0; min-height: 1.2em; font-size: .85rem; color: var(--rose-deep); text-align: center; }
+.booking__status { margin: 1rem 0 0; min-height: 1.2em; font-size: .85rem; color: var(--rose-text); text-align: center; }
 .booking__status:empty { margin: 0; min-height: 0; }
 
 /* =================================================================
@@ -502,12 +542,14 @@ body.menu-open .drawer {
    ================================================================= */
 .foot { background: var(--ink); color: rgba(253,245,239,.78); padding-block: clamp(3rem, 6vw, 5rem); }
 .foot__grid { display: grid; grid-template-columns: 1fr auto auto; gap: 2rem; align-items: center; }
+.foot__mark { display: block; width: 17px; height: 24px; margin-bottom: .7rem; }
+.foot__mark svg { width: 100%; height: 100%; }
 .foot__brand .brand__word { color: var(--on-film); font-size: 1.8rem; }
 .foot__brand p { margin: .4rem 0 0; font-size: .9rem; }
 .foot__nav { display: flex; gap: 1.6rem; flex-wrap: wrap; }
 .foot__nav a { font-size: .82rem; letter-spacing: .1em; text-transform: uppercase; opacity: .8; padding-block: .35rem; transition: opacity .3s; }
 .foot__nav a:hover { opacity: 1; color: var(--gold-soft); }
-.foot__legal { grid-column: 1 / -1; border-top: 1px solid rgba(253,245,239,.12); padding-top: 1.6rem; font-size: .8rem; opacity: .6; margin: 1rem 0 0; }
+.foot__legal { grid-column: 1 / -1; border-top: 1px solid var(--line-light); padding-top: 1.6rem; font-size: .8rem; opacity: .78; margin: 1rem 0 0; }
 
 /* =================================================================
    REVEAL (entrada no scroll)
@@ -522,7 +564,7 @@ body.menu-open .drawer {
 
 @media (max-width: 980px) {
   .section__head { grid-template-columns: 1fr; align-items: start; }
-  .pillars, .plans, .quotes { grid-template-columns: 1fr; }
+  .pillars, .plans { grid-template-columns: 1fr; }
   .visite__grid { grid-template-columns: 1fr; }
   .menu__item { grid-template-columns: 1fr auto; grid-template-areas: "name price" "desc desc"; row-gap: .6rem; }
   .menu__name { grid-area: name; } .menu__meta { grid-area: price; } .menu__desc { grid-area: desc; }
@@ -568,6 +610,8 @@ body.menu-open .drawer {
   .exp__hint { display: none; }
   .exp__track { flex-direction: column; padding-right: 0; gap: 1rem; }
   .step { width: 100%; min-height: 0; }
+  .step__photo img { aspect-ratio: 16 / 10; }
+  .step__seal svg { height: 46px; }
 }
 
 /* Sem pin (reduced-motion ou sem GSAP) em qualquer largura: empilha como no mobile,
@@ -581,6 +625,8 @@ body.menu-open .drawer {
 .no-pin .exp__hint { display: none; }
 .no-pin .exp__track { flex-direction: column; padding-right: 0; gap: 1rem; }
 .no-pin .step { width: 100%; min-height: 0; }
+.no-pin .step__photo img { aspect-ratio: 16 / 10; }
+.no-pin .step__seal svg { height: 46px; }
 
 /* feedback de erro do formulário (campos obrigatórios) */
 @keyframes serenoShake {
@@ -593,3 +639,266 @@ body.menu-open .drawer {
 .booking--err { animation: serenoShake .45s var(--ease); }
 .booking--err input:invalid,
 .booking--err input:placeholder-shown[required] { border-color: var(--rose-deep); }
+
+/* =================================================================
+   REDESIGN EDITORIAL — folios (I–IX) + seções novas e refeitas
+   (hero permanece intacto)
+   ================================================================= */
+
+/* folio: eyebrow com numeral romano; dourado profundo p/ contraste AA em texto pequeno */
+.eyebrow--folio { color: var(--gold-deep); }
+.note--center { text-align: center; max-width: 46ch; margin-inline: auto; }
+
+/* ACESSIBILIDADE — botão/fita dourados legíveis (paper sobre gold-deep = 5.3:1;
+   sobre o gold antigo era 2.8:1, reprovava AA e o CLAUDE.md bane "texto invisível") */
+.btn--gold { background: var(--gold-deep); }
+.btn--gold:hover { background: #6f5220; }
+.btn--ghost:hover { background: var(--gold-deep); border-color: var(--gold-deep); }
+.plan__ribbon { background: var(--gold-deep); }
+/* HERO (travado): preserva o botão dourado original, exatamente como estava */
+.hero__cta .btn--gold { background: var(--gold); }
+.hero__cta .btn--gold:hover { background: #a87f3e; }
+
+/* -------- Problema · O que a semana deixa (faixa escura) -------- */
+.problema { background: var(--ink); color: var(--on-film); }
+.problema__grid {
+  display: grid; grid-template-columns: 7fr 5fr;
+  gap: clamp(2rem, 6vw, 5.5rem); align-items: start;
+}
+.problema .display { color: var(--on-film); max-width: 11ch; }
+.problema .display em, .fechamento__title em { color: var(--gold-soft); font-style: italic; }
+.problema__sub {
+  margin-top: 1.5rem; color: rgba(253,245,239,.66);
+  font-size: clamp(1rem, 1.4vw, 1.18rem); max-width: 30ch;
+}
+.inventory { display: flex; flex-direction: column; }
+.inventory li {
+  list-style: none; position: relative; padding: 1.05rem 0 1.05rem 2.4rem;
+  border-top: 1px solid rgba(253,245,239,.12);
+  color: rgba(253,245,239,.82); font-size: clamp(1rem, 1.35vw, 1.15rem); line-height: 1.5;
+}
+.inventory li:last-child { border-bottom: 1px solid rgba(253,245,239,.12); }
+.inventory li::before {
+  content: ""; position: absolute; left: 0; top: 1.55em;
+  width: 18px; height: 1px; background: var(--gold-soft); opacity: .8;
+}
+.problema__bridge {
+  max-width: var(--maxw); margin: clamp(3rem, 6vw, 4.5rem) auto 0; padding-inline: var(--pad-x);
+  font-family: var(--display); font-style: italic; line-height: 1.25;
+  font-size: clamp(1.5rem, 3vw, 2.3rem); color: var(--on-film);
+}
+.problema__bridge em { color: var(--gold-soft); font-style: italic; }
+
+/* -------- O Método (3 tempos, numerais romanos grandes) -------- */
+.metodo { background: var(--cream); }
+.tempos {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem); margin-top: clamp(3rem, 6vw, 5rem);
+}
+.tempo { list-style: none; border-top: 1px solid var(--line); padding-top: 1.7rem; }
+.tempo__num {
+  display: block; font-family: var(--display); font-style: italic; font-weight: 300;
+  font-size: clamp(3.2rem, 6vw, 5rem); line-height: .82; color: var(--gold-deep); letter-spacing: .02em;
+}
+.tempo__name {
+  font-family: var(--display); font-weight: 400; font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  color: var(--ink); margin: 1rem 0 .7rem;
+}
+.tempo p { color: var(--ink-soft); font-size: .98rem; max-width: 34ch; }
+
+/* -------- Rituais (coluna sticky + lista editorial) -------- */
+.rituais__grid {
+  display: grid; grid-template-columns: 4fr 8fr;
+  gap: clamp(2rem, 5vw, 5rem); align-items: start;
+}
+.rituais__aside { position: sticky; top: clamp(96px, 13vh, 132px); }
+.rituais__count {
+  font-family: var(--display); font-size: 1.05rem; color: var(--ink-faint);
+  letter-spacing: .04em; margin: 1.4rem 0 1.5rem;
+}
+.rituais__count span {
+  font-style: italic; font-size: 2.1rem; color: var(--gold-deep); margin-right: .3rem; vertical-align: -.14em;
+}
+.rituais__star-note {
+  font-family: var(--display); font-style: italic; color: var(--rose-text);
+  font-size: clamp(1.2rem, 2vw, 1.5rem); margin-top: 1.6rem;
+}
+/* hover refinado (Emil): régua que se desenha + preço que desloca */
+.menu__item { position: relative; }
+.menu__item:hover { background: linear-gradient(90deg, rgba(236,204,198,.14), transparent 82%); box-shadow: none; }
+.menu__item::after {
+  content: ""; position: absolute; left: 0; bottom: -1px; height: 1px; width: 0;
+  background: var(--gold); transition: width .5s var(--ease);
+}
+.menu__item:hover::after { width: 100%; }
+.menu__price { transition: transform .4s var(--ease); }
+.menu__item:hover .menu__price { transform: translateX(-4px); }
+
+/* -------- A Experiência (marcadores de minuto + linha do tempo) -------- */
+.exp__pin { position: relative; }
+.step__min {
+  display: block; font-family: var(--sans); font-size: .68rem; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--gold-soft); opacity: .9; margin-bottom: .9rem;
+}
+/* fotos dos passos em arco (eco da janela arqueada do herói) */
+.step__photo { margin: 0 0 1.2rem; }
+.step__photo img {
+  /* height:auto anula o atributo height do <img>, senão o aspect-ratio é ignorado */
+  width: 100%; height: auto; aspect-ratio: 7 / 8; object-fit: cover;
+  border-radius: 999px 999px 6px 6px;
+  filter: sepia(.08) saturate(.95);
+}
+/* foco por card quando o formato vira 16/10 (mobile / sem pin);
+   o 3º fica no centro padrão */
+.step:nth-child(1) .step__photo img { object-position: 50% 55%; }
+.step:nth-child(2) .step__photo img { object-position: 50% 52%; }
+.step:nth-child(4) .step__photo img { object-position: 50% 62%; }
+.step:nth-child(5) .step__photo img { object-position: 50% 55%; }
+/* despedida: a recepção fecha a linha do tempo, selada pela marca */
+.step__photo--finale { position: relative; }
+.step__photo--finale img { filter: sepia(.08) saturate(.95) brightness(.92); }
+.step__seal {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  border-radius: 999px 999px 6px 6px;
+  background: linear-gradient(180deg, rgba(58,44,40,.14), rgba(58,44,40,.4));
+}
+.step__seal svg { height: 62px; opacity: .95; filter: drop-shadow(0 6px 16px rgba(0,0,0,.35)); }
+.step h3 { margin: 0 0 .8rem; }
+.exp__sub { margin-top: 1.1rem; color: rgba(253,245,239,.7); font-size: .95rem; }
+.exp__progress {
+  display: none; position: absolute; left: var(--pad-x); right: 12vw;
+  bottom: clamp(2rem, 8vh, 4.5rem); height: 1px; background: var(--line-light);
+  z-index: 2; pointer-events: none;
+}
+.exp__progress i {
+  display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: left;
+  background: linear-gradient(90deg, var(--gold-2), var(--gold-soft));
+}
+@media (min-width: 821px) { .exp__progress { display: block; } }
+
+/* -------- As mãos (terapeutas · retratos em arco) -------- */
+.maos { background: var(--cream); }
+.hands {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: clamp(1.5rem, 3vw, 2.5rem); margin-top: clamp(3rem, 6vw, 5rem);
+}
+.hand { list-style: none; }
+/* retratos em arco (eco da janela arqueada do herói) */
+.hand__photo {
+  display: block; width: 100%; aspect-ratio: 3 / 4; margin: 0 0 1.3rem;
+  border-radius: 999px 999px 6px 6px; overflow: hidden;
+}
+.hand__photo img { width: 100%; height: 100%; object-fit: cover; filter: sepia(.06) saturate(.96); }
+.hand__name {
+  font-family: var(--display); font-weight: 400; font-size: 1.3rem;
+  color: var(--ink); line-height: 1.15; margin-bottom: .35rem;
+}
+.hand__meta {
+  font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--gold-deep); margin-bottom: .85rem;
+}
+.hand__line { font-size: .94rem; color: var(--ink-soft); }
+.creds {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(1rem, 2.5vw, 2rem);
+  margin-top: clamp(2.5rem, 5vw, 4rem); border-top: 1px solid var(--line);
+  padding-top: clamp(2rem, 3vw, 2.6rem);
+}
+.creds li {
+  list-style: none; position: relative; padding-left: 1.8rem;
+  font-size: .9rem; color: var(--ink-soft); line-height: 1.45;
+}
+.creds li::before {
+  content: ""; position: absolute; left: 0; top: .55em; width: 16px; height: 1px;
+  background: var(--gold); opacity: .75;
+}
+
+/* -------- Vozes (depoimento herói + apoio + stat) -------- */
+.quote--hero { max-width: 640px; margin: 0 auto clamp(2.5rem, 5vw, 3.5rem); }
+.quote--hero blockquote { font-size: clamp(1.6rem, 3.2vw, 2.5rem); line-height: 1.32; color: var(--ink); }
+.vozes .quotes { max-width: 860px; margin-inline: auto; }  /* base .quotes já é 2col */
+.quote figcaption span { color: var(--ink-faint); letter-spacing: .12em; }
+.stat__num { font-family: var(--display); color: var(--ink); }
+.stat__sep { color: var(--ink-faint); margin: 0 .35em; }
+
+/* estrelas douradas + selo do Google (avaliações) */
+.svg-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* dourado vivo a pedido do cliente (2,1:1 — abaixo do AA não-textual, decisão dele;
+   a nota fica acessível pelo aria-label "5 estrelas" em cada bloco) */
+.stars { display: inline-flex; gap: .28rem; color: var(--gold-2); margin-bottom: 1rem; }
+.stars svg { display: inline-block; width: 15px; height: 15px; }
+.stars--lg { margin-bottom: 1.3rem; }
+.stars--lg svg { width: 19px; height: 19px; }
+.stars--stat { margin: 0 .15rem 0 .35rem; vertical-align: -.14em; }
+.stars--stat svg { width: 14px; height: 14px; }
+.gicon { display: inline-block; width: 13px; height: 13px; vertical-align: -.16em; }
+.gicon--stat { width: 17px; height: 17px; vertical-align: -.22em; margin-right: .3rem; }
+
+/* -------- Planos (ancoragem + reversão de risco) -------- */
+.plan__anchor {
+  font-size: .82rem; color: var(--gold-deep); letter-spacing: .02em; margin: -.7rem 0 1.4rem;
+}
+.plan__anchor span { color: var(--ink-faint); }
+.plan__risk { margin: .9rem 0 0; text-align: center; font-size: .8rem; color: var(--ink-faint); letter-spacing: .02em; }
+
+/* -------- Perguntas (FAQ · <details> nativo) -------- */
+.faq { background: var(--cream-2); }
+.faq__grid {
+  display: grid; grid-template-columns: 4fr 8fr;
+  gap: clamp(2rem, 5vw, 5rem); align-items: start;
+}
+.faq__aside { position: sticky; top: clamp(96px, 13vh, 132px); }
+.faq__list { border-top: 1px solid var(--line); }
+.faq__item { border-bottom: 1px solid var(--line); }
+.faq__item summary {
+  list-style: none; cursor: pointer; position: relative; padding: 1.35rem 3rem 1.35rem 0;
+  font-family: var(--display); font-weight: 400; font-size: clamp(1.2rem, 2vw, 1.5rem);
+  color: var(--ink); line-height: 1.3; transition: color .3s;
+}
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary::after {
+  content: ""; position: absolute; right: 5px; top: 50%; width: 11px; height: 11px;
+  border-right: 1.5px solid var(--gold-deep); border-bottom: 1.5px solid var(--gold-deep);
+  transform: translateY(-70%) rotate(45deg); transition: transform .35s var(--ease);
+}
+.faq__item[open] summary::after { transform: translateY(-25%) rotate(-135deg); }
+.faq__item summary:hover { color: var(--rose-deep); }
+.faq__ans { padding: 0 3rem 1.6rem 0; }
+.faq__ans p { margin: 0; color: var(--ink-soft); font-size: .98rem; line-height: 1.65; max-width: 54ch; }
+.faq__item[open] .faq__ans { animation: faqIn .45s var(--ease); }
+@keyframes faqIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.faq__note { text-align: center; }
+
+/* -------- Fechamento (funde no rodapé escuro) -------- */
+.fechamento {
+  text-align: center; border-bottom: 1px solid rgba(253,245,239,.12);
+  padding: clamp(3.5rem, 8vw, 6rem) var(--pad-x) clamp(3rem, 6vw, 4.5rem);
+}
+.fechamento__title { color: var(--on-film); max-width: 15ch; margin: 0 auto; }
+.fechamento__urgency {
+  margin: 1.8rem auto 0; max-width: 46ch; color: rgba(253,245,239,.72);
+  font-size: 1rem; line-height: 1.6;
+}
+.fechamento__cta { margin-top: 2.4rem; }
+
+/* -------- responsivo (seções novas) -------- */
+@media (max-width: 980px) {
+  .casa .wrap { grid-template-columns: 1fr; }
+  .casa__figure { grid-column: 1; grid-row: auto; width: min(76%, 340px); margin: 2.6rem auto 0; }
+  .problema__grid { grid-template-columns: 1fr; gap: 2.4rem; }
+  .tempos { grid-template-columns: 1fr; }
+  .rituais__grid, .faq__grid { grid-template-columns: 1fr; }
+  .rituais__aside, .faq__aside { position: static; }
+  .hands, .creds { grid-template-columns: 1fr 1fr; }
+  .vozes .quotes { grid-template-columns: 1fr; max-width: 520px; }
+}
+@media (max-width: 600px) {
+  .hands, .creds { grid-template-columns: 1fr; }
+  .hand__photo { max-width: 300px; }
+  .faq__item summary, .faq__ans { padding-right: 2.2rem; }
+}
+
+/* -------- redução de movimento (extras do redesign) -------- */
+@media (prefers-reduced-motion: reduce) {
+  .exp__progress { display: none; }
+}
+.no-pin .exp__progress { display: none; }

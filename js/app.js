@@ -12,6 +12,12 @@
   const hasGSAP = !!(window.gsap && window.ScrollTrigger);
   if (hasGSAP) gsap.registerPlugin(ScrollTrigger);
 
+  // Constantes de motion (ms). NAV_OFFSET acompanha o scroll-margin-top do CSS.
+  const NAV_OFFSET          = 76;   // recuo das âncoras sob a navbar fixa (= scroll-margin-top)
+  const REVEAL_STAGGER_STEP = 80;   // atraso entre irmãos que entram no scroll
+  const REVEAL_STAGGER_MAX  = 320;  // teto do atraso acumulado
+  const COUNT_DURATION_MS   = 1400; // duração do count-up do stat de prova
+
   // Sem pin (reduced-motion ou sem GSAP): CSS empilha a galeria #experiencia.
   if (REDUCE || !hasGSAP) document.documentElement.classList.add('no-pin');
 
@@ -35,7 +41,6 @@
     }
   }
 
-  const NAV_OFFSET = 64;
   function scrollToTarget(hash) {
     const el = document.querySelector(hash);
     if (!el) return;
@@ -67,6 +72,10 @@
       burger.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
     }
     if (drawer) drawer.setAttribute('aria-hidden', String(!open));
+    // fundo (main + rodapé) fica inerte p/ leitor de tela enquanto o menu cobre a tela.
+    // O header NÃO — o botão de fechar (burger) mora nele e precisa continuar operável.
+    [document.getElementById('topo'), document.querySelector('.foot')]
+      .forEach((el) => { if (el) el.inert = open; });
     // trava a rolagem de fundo enquanto o menu cobre a tela (evita scroll-bleed)
     document.documentElement.style.overflow = open ? 'hidden' : '';
     if (lenis) open ? lenis.stop() : lenis.start();
@@ -128,7 +137,7 @@
           ? Array.from(el.parentElement.querySelectorAll(':scope > .reveal'))
           : [el];
         const i = Math.max(0, group.indexOf(el));
-        el.style.transitionDelay = Math.min(i * 80, 320) + 'ms';
+        el.style.transitionDelay = Math.min(i * REVEAL_STAGGER_STEP, REVEAL_STAGGER_MAX) + 'ms';
         el.classList.add('is-in');
         io.unobserve(el);
       });
@@ -178,6 +187,7 @@
   (function setupExperience() {
     const pin   = document.getElementById('expPin');
     const track = document.getElementById('expTrack');
+    const line  = document.getElementById('expLine'); // linha do tempo dourada
     if (!pin || !track) return;
 
     if (!hasGSAP || REDUCE) return; // mobile/reduzido: empilhamento vertical via CSS
@@ -196,10 +206,42 @@
           scrub: 0.6,
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          // a linha do tempo dourada se desenha junto com o avanço horizontal
+          onUpdate: (self) => { if (line) line.style.transform = 'scaleX(' + self.progress.toFixed(4) + ')'; },
         },
       });
-      return () => { tween.kill(); gsap.set(track, { clearProps: 'x' }); };
+      return () => { tween.kill(); gsap.set(track, { clearProps: 'x' }); if (line) line.style.transform = 'scaleX(0)'; };
     });
+  })();
+
+  /* ---------------- Contadores (stat de prova social) ---------------- */
+  (function countUp() {
+    const nums = Array.from(document.querySelectorAll('.stat__num[data-count]'));
+    if (!nums.length) return;
+    const fmt = (el, v) => {
+      const dec = +(el.dataset.decimals || 0);
+      const s = v.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+      el.textContent = (el.dataset.prefix || '') + s + (el.dataset.suffix || '');
+    };
+    if (REDUCE || !('IntersectionObserver' in window)) {
+      nums.forEach((el) => fmt(el, parseFloat(el.dataset.count)));
+      return;
+    }
+    const run = (el) => {
+      const target = parseFloat(el.dataset.count);
+      const dur = COUNT_DURATION_MS; let start = null;
+      const tick = (t) => {
+        if (start === null) start = t;
+        const p = Math.min(1, (t - start) / dur);
+        fmt(el, target * (1 - Math.pow(1 - p, 3))); // easeOutCubic
+        if (p < 1) requestAnimationFrame(tick); else fmt(el, target);
+      };
+      requestAnimationFrame(tick);
+    };
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { run(en.target); io.unobserve(en.target); } });
+    }, { threshold: 0.6 });
+    nums.forEach((el) => io.observe(el));
   })();
 
   /* ---------------- Formulário → WhatsApp ---------------- */
