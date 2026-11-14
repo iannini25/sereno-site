@@ -20,6 +20,8 @@
 
   // Sem pin (reduced-motion ou sem GSAP): CSS empilha a galeria #experiencia.
   if (REDUCE || !hasGSAP) document.documentElement.classList.add('no-pin');
+  const MOTION = hasGSAP && !REDUCE;
+  if (MOTION) document.documentElement.classList.add('js-motion');
 
   /* ---------------- Lenis (rolagem suave) ---------------- */
   let lenis = null;
@@ -124,26 +126,81 @@
     });
   });
 
-  /* ---------------- Entrada no scroll (.reveal) ---------------- */
-  const reveals = Array.from(document.querySelectorAll('.reveal'));
-  if (REDUCE || !('IntersectionObserver' in window)) {
-    reveals.forEach((el) => el.classList.add('is-in'));
-  } else {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (!en.isIntersecting) return;
-        const el = en.target;
-        const group = el.parentElement
-          ? Array.from(el.parentElement.querySelectorAll(':scope > .reveal'))
-          : [el];
-        const i = Math.max(0, group.indexOf(el));
-        el.style.transitionDelay = Math.min(i * REVEAL_STAGGER_STEP, REVEAL_STAGGER_MAX) + 'ms';
-        el.classList.add('is-in');
-        io.unobserve(el);
+  /* ---------------- Motion: reveal, stagger, 2 tons, parallax, profundidade ---------------- */
+  if (MOTION) {
+    gsap.utils.toArray('[data-reveal]').forEach((el) => {
+      gsap.to(el, { opacity: 1, y: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+    });
+    gsap.utils.toArray('[data-stagger]').forEach((g) => {
+      gsap.to(g.children, { opacity: 1, y: 0, duration: .85, ease: 'power3.out', stagger: .09,
+        scrollTrigger: { trigger: g, start: 'top 85%', once: true } });
+    });
+    // frase-manifesto: palavra por palavra, de apagada para cheia
+    document.querySelectorAll('[data-scrub-text]').forEach((p) => {
+      const words = p.textContent.trim().split(/\s+/);
+      p.setAttribute('aria-label', p.textContent.trim());
+      p.innerHTML = words.map((w) => `<span class="w" aria-hidden="true">${w}</span>`).join(' ');
+      gsap.fromTo(p.querySelectorAll('.w'), { opacity: .22 }, { opacity: 1, stagger: .05, ease: 'none',
+        scrollTrigger: { trigger: p, start: 'top 80%', end: 'bottom 50%', scrub: true } });
+    });
+    // parallax leve: palavra gigante e fotos grandes
+    gsap.utils.toArray('[data-parallax]').forEach((el) => {
+      gsap.fromTo(el, { yPercent: 0 }, { yPercent: parseFloat(el.dataset.parallax) || -10, ease: 'none',
+        scrollTrigger: { trigger: el.closest('section') || el, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+    gsap.utils.toArray('.step__photo img, .hand__photo img').forEach((img) => {
+      gsap.fromTo(img, { yPercent: -4 }, { yPercent: 4, ease: 'none',
+        scrollTrigger: { trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+    // recorte "3D": sobe mais rápido que o card (sai pela borda de cima) + tilt sutil no ponteiro
+    document.querySelectorAll('[data-depth]').forEach((el) => {
+      gsap.fromTo(el, { y: 40 }, { y: -30, ease: 'none',
+        scrollTrigger: { trigger: el.closest('figure') || el, start: 'top bottom', end: 'bottom top', scrub: true } });
+      if (!matchMedia('(pointer: fine)').matches) return;
+      const host = el.closest('figure') || el;
+      const img = el.querySelector('img');
+      host.addEventListener('pointermove', (e) => {
+        const r = host.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        gsap.to(img, { rotateY: x * 8, rotateX: -y * 6, transformPerspective: 900, duration: .6, ease: 'power3.out' });
       });
-    }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
-    reveals.forEach((el) => io.observe(el));
+      host.addEventListener('pointerleave', () => gsap.to(img, { rotateY: 0, rotateX: 0, duration: .8, ease: 'power3.out' }));
+    });
   }
+
+  /* ---------------- FAQ: acordeão ---------------- */
+  document.querySelectorAll('.faq__q').forEach((b) => {
+    b.addEventListener('click', () => {
+      const item = b.closest('.faq__item');
+      const open = !item.classList.contains('is-open');
+      item.classList.toggle('is-open', open);
+      b.setAttribute('aria-expanded', String(open));
+      if (hasGSAP) setTimeout(() => ScrollTrigger.refresh(), 520);
+    });
+  });
+
+  /* ---------------- H7: cursor próprio com atraso ---------------- */
+  (function cursor() {
+    const c = document.querySelector('.cursor');
+    if (!c || REDUCE || !matchMedia('(pointer: fine) and (hover: hover)').matches) return;
+    let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, raf = 0;
+    const loop = () => {
+      cx += (x - cx) * .16; cy += (y - cy) * .16;
+      c.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+      raf = Math.abs(x - cx) + Math.abs(y - cy) > .3 ? requestAnimationFrame(loop) : 0;
+    };
+    addEventListener('pointermove', (e) => {
+      x = e.clientX; y = e.clientY; c.classList.add('is-on');
+      const t = e.target;
+      const field = t.closest('input, select, textarea, .dd');
+      c.classList.toggle('is-view', !field && !!t.closest('[data-cursor]') && !t.closest('a, button'));
+      c.classList.toggle('is-big', !field && !!t.closest('main .display, .foot .display'));
+      if (field) c.classList.remove('is-on');
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: true });
+    document.addEventListener('pointerleave', () => c.classList.remove('is-on'));
+  })();
 
   /* ---------------- Seção ativa na navbar ---------------- */
   (function activeSection() {
@@ -195,7 +252,8 @@
     const mm = gsap.matchMedia();
     mm.add('(min-width: 821px)', () => {
       const getX = () => Math.max(0, pin.scrollWidth - pin.clientWidth);
-      const tween = gsap.to(track, {
+      const movers = pin.querySelectorAll('.exp__intro, .exp__track');
+      const tween = gsap.to(movers, {
         x: () => -getX(),
         ease: 'none',
         scrollTrigger: {
@@ -210,13 +268,13 @@
           onUpdate: (self) => { if (line) line.style.transform = 'scaleX(' + self.progress.toFixed(4) + ')'; },
         },
       });
-      return () => { tween.kill(); gsap.set(track, { clearProps: 'x' }); if (line) line.style.transform = 'scaleX(0)'; };
+      return () => { tween.kill(); gsap.set(movers, { clearProps: 'x' }); if (line) line.style.transform = 'scaleX(0)'; };
     });
   })();
 
   /* ---------------- Contadores (stat de prova social) ---------------- */
   (function countUp() {
-    const nums = Array.from(document.querySelectorAll('.stat__num[data-count]'));
+    const nums = Array.from(document.querySelectorAll('[data-count]'));
     if (!nums.length) return;
     const fmt = (el, v) => {
       const dec = +(el.dataset.decimals || 0);
@@ -240,7 +298,7 @@
     };
     const io = new IntersectionObserver((entries) => {
       entries.forEach((en) => { if (en.isIntersecting) { run(en.target); io.unobserve(en.target); } });
-    }, { threshold: 0.6 });
+    }, { threshold: 0.4 });
     nums.forEach((el) => io.observe(el));
   })();
 
